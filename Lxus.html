@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>فاتورة جديدة - تركيبة</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .invoice-box {
+            max-width: 800px;
+            margin: auto;
+            padding: 40px;
+            border: 1px solid #ddd;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            color: #333;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #00b3a6;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .logo-container {
+            text-align: right;
+        }
+        .logo-container h1 {
+            color: #00b3a6; 
+            margin: 0;
+            font-size: 32px;
+            letter-spacing: 1px;
+        }
+        .invoice-details {
+            text-align: left;
+        }
+        .invoice-details h2 {
+            margin: 0;
+            color: #333;
+            font-size: 24px;
+        }
+        .invoice-details p {
+            margin: 5px 0 0 0;
+            color: #555;
+        }
+        .info-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .bill-to {
+            background-color: #f4fcfc;
+            padding: 15px 20px;
+            border-right: 4px solid #00b3a6;
+            border-radius: 4px;
+            width: auto;
+            max-width: 75%;
+        }
+        .bill-to h3 { 
+            margin-top: 0; 
+            color: #00b3a6; 
+            font-size: 16px;
+        }
+        .bill-to strong {
+            font-size: 18px;
+            color: #222;
+            white-space: nowrap;
+        }
+        .table-responsive {
+            width: 100%;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table th, table td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+        table th:first-child, table td:first-child {
+            text-align: right;
+        }
+        table th {
+            background-color: #00b3a6;
+            color: white;
+            font-weight: bold;
+        }
+        .totals {
+            width: 45%;
+            margin-right: auto;
+            margin-left: 0;
+        }
+        .totals table th { 
+            background-color: transparent; 
+            color: #333; 
+            text-align: right;
+        }
+        .totals table td {
+            text-align: left;
+            font-weight: bold;
+        }
+        .totals table td, .totals table th { 
+            border: none; 
+            padding: 10px 8px; 
+            border-bottom: 1px solid #eee;
+        }
+        .totals .final-total {
+            font-size: 1.2em;
+            color: #00b3a6;
+        }
+        .totals .final-total th, .totals .final-total td {
+            border-top: 2px solid #00b3a6;
+            border-bottom: none;
+            padding-top: 15px;
+        }
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 60px;
+            padding-top: 20px;
+        }
+        .signature-box {
+            text-align: center;
+        }
+        .signature-line {
+            width: 200px;
+            border-bottom: 1px solid #333;
+            margin-bottom: 10px;
+        }
+        .stamp-box {
+            text-align: center;
+            position: relative;
+            padding-right: 30px;
+        }
+        .stamp {
+            width: 130px;
+            height: 130px;
+            border: 4px double rgba(0, 179, 166, 0.7);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: rgba(0, 179, 166, 0.8);
+            transform: rotate(-15deg);
+            position: relative;
+            font-family: Arial, sans-serif;
+        }
+        .stamp::before {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px; right: 4px; bottom: 4px;
+            border: 1px dashed rgba(0, 179, 166, 0.5);
+            border-radius: 50%;
+        }
+        .stamp .text-ar {
+            font-size: 26px;
+            font-weight: bold;
+            font-family: 'Tajawal', sans-serif;
+            margin-bottom: 2px;
+        }
+        .stamp .text-en {
+            font-size: 14px;
+            font-weight: bold;
+            border-top: 1px solid rgba(0, 179, 166, 0.5);
+            padding-top: 4px;
+            letter-spacing: 2px;
+        }
+
+        @media print {
+            @page {
+                size: A4;
+                margin: 1cm;
+            }
+            body { background-color: #fff; padding: 0; }
+            .invoice-box { box-shadow: none; border: none; padding: 0; max-width: 100%; }
+            .bill-to { background-color: #f4fcfc !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            table th { background-color: #00b3a6 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .stamp { border-color: rgba(0, 179, 166, 0.7) !important; color: rgba(0, 179, 166, 0.8) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .stamp::before { border-color: rgba(0, 179, 166, 0.5) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-box">
+        <div class="header">
+            <div class="logo-container">
+                <h1>تـركـيـبـة | Tarkiba</h1>
+                <p style="margin: 5px 0; color: #666; font-weight: bold;">لأغطية حماية الطاولات والأثاث</p>
+            </div>
+            <div class="invoice-details">
+                <h2>فاتورة مبيعات</h2>
+                <p>رقم الفاتورة: #INV-00143</p>
+                <p>التاريخ: 15 أبريل 2026</p>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <div class="bill-to">
+                <h3>فاتورة إلى:</h3>
+                <strong>شركة ساس لتجارة و خدمات المركبات المحدودة / لكزس</strong><br>
+                <span style="color: #666; margin-top: 5px; display: inline-block;">بغداد، العراق</span>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>تفاصيل المنتج</th>
+                        <th>القياس</th>
+                        <th>السمك</th>
+                        <th>الكمية</th>
+                        <th>السعر (د.ع)</th>
+                        <th>الإجمالي (د.ع)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>غطاء طاولة حماية (مربع)</td>
+                        <td><span dir="ltr">80 x 80</span></td>
+                        <td><span dir="ltr">2.5 mm</span></td>
+                        <td>1</td>
+                        <td>11,000</td>
+                        <td>11,000</td>
+                    </tr>
+                    <tr>
+                        <td>غطاء طاولة حماية (دائري)</td>
+                        <td><span dir="ltr">80 cm</span></td>
+                        <td><span dir="ltr">2.5 mm</span></td>
+                        <td>2</td>
+                        <td>11,000</td>
+                        <td>22,000</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="totals">
+            <table>
+                <tr>
+                    <th>المجموع الفرعي:</th>
+                    <td>33,000</td>
+                </tr>
+                <tr>
+                    <th>أجور التوصيل:</th>
+                    <td>5,000</td>
+                </tr>
+                <tr class="final-total">
+                    <th>الإجمالي النهائي:</th>
+                    <td>38,000 د.ع</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="footer">
+            <div class="stamp-box">
+                <div class="stamp">
+                    <span class="text-ar">تركيبة</span>
+                    <span class="text-en">APPROVED</span>
+                </div>
+            </div>
+            <div class="signature-box">
+                <div class="signature-line"></div>
+                <strong>توقيع المجهز / الإدارة</strong>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
