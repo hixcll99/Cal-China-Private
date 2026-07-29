@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rolls Pricing System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary: #18dcd8;
+            --primary-dark: #15b8b4;
+            --bg: #f3f4f6;
+            --surface: #ffffff;
+            --text: #1f2937;
+            --border: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            background: var(--surface);
+            width: 100%;
+            max-width: 1250px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .settings-card {
+            background: var(--bg);
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .settings-card input {
+            width: 80px;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-weight: 700;
+            text-align: center;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .ui-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .ui-table th {
+            text-align: left;
+            padding: 12px;
+            color: #6b7280;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .ui-table td {
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .ui-table input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .ui-table .short-input { width: 70px; }
+
+        .btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background 0.2s;
+        }
+
+        .btn:hover { background: var(--primary-dark); }
+        
+        /* تنسيق أزرار التحكم بالصفوف */
+        .actions-cell {
+            display: flex;
+            gap: 5px;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        
+        .btn-action {
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 8px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        .btn-move { background: #e5e7eb; color: #374151; }
+        .btn-move:hover { background: #d1d5db; }
+        
+        .btn-delete { background: #fee2e2; color: #ef4444; font-weight: bold; }
+        .btn-delete:hover { background: #fca5a5; }
+
+        .btn-pdf { background: #374151; margin-left: 10px; }
+        .btn-pdf:hover { background: #1f2937; }
+        .btn-pdf-simple { background: #6b7280; margin-left: 10px; }
+        .btn-pdf-simple:hover { background: #4b5563; }
+
+        .footer-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-top: 20px;
+        }
+
+        .buttons-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .totals-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .total-box {
+            background: var(--bg);
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        .total-box span {
+            color: var(--text);
+            font-weight: 700;
+            font-size: 1.3rem;
+            margin-left: 10px;
+        }
+
+        .grand-total span {
+            color: var(--primary-dark);
+            font-size: 1.5rem;
+        }
+
+        /* الحاوية المخفية للطباعة */
+        #print-area {
+            display: none;
+        }
+
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            @page {
+                size: A4 portrait;
+                margin: 15mm;
+            }
+
+            body {
+                background-color: #fff;
+                margin: 0;
+                padding: 0;
+            }
+
+            .container { display: none !important; }
+            #print-area { display: block !important; width: 100%; }
+
+            .pdf-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-family: 'Calibri', 'Inter', sans-serif;
+                font-size: 14pt;
+            }
+
+            .pdf-table th, .pdf-table td {
+                border: 1pt solid #9cc2e5 !important;
+                padding: 8px 12px;
+                color: #000 !important;
+            }
+
+            .pdf-table thead th {
+                background-color: #5b9bd5 !important;
+                color: #ffffff !important;
+                font-weight: bold;
+            }
+
+            .pdf-table tbody tr:nth-child(even) { background-color: #ddebf7 !important; }
+            .pdf-table tbody tr:nth-child(odd) { background-color: #ffffff !important; }
+
+            .pdf-table tfoot th, .pdf-table tfoot td {
+                background-color: #404040 !important;
+                color: #ffffff !important;
+                font-weight: bold;
+                border: 1pt solid #404040 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Rolls Pricing & Management</h1>
+        <div class="settings-card">
+            <label>Price per Sqm (USD):</label>
+            <input type="number" id="sqm-price" value="3.85" step="0.01" oninput="calculateAll()">
+        </div>
+    </div>
+
+    <table class="ui-table">
+        <thead>
+            <tr>
+                <th>Width (cm)</th>
+                <th>Length (m)</th>
+                <th>Thickness (mm)</th>
+                <th>Qty</th>
+                <th>Note (Optional)</th>
+                <th style="text-align: right;">Unit Price</th>
+                <th style="text-align: right;">Line Total</th>
+                <th style="text-align: right; width: 100px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+            <tr>
+                <td><input type="number" class="w-val short-input" value="40" step="1" oninput="calculateAll()"></td>
+                <td><input type="number" class="l-val short-input" value="20" step="1" oninput="calculateAll()"></td>
+                <td><input type="number" class="t-val short-input" value="2.5" step="0.1" oninput="calculateAll()"></td>
+                <td><input type="number" class="q-val short-input" value="2" step="1" oninput="calculateAll()"></td>
+                <td><input type="text" class="n-val" placeholder="e.g. Other type" oninput="calculateAll()"></td>
+                <td style="text-align: right; font-weight: 600;" class="u-price">$0.00</td>
+                <td style="text-align: right; font-weight: 600;" class="l-total">$0.00</td>
+                <td>
+                    <div class="actions-cell">
+                        <button class="btn-action btn-move" onclick="moveUp(this)" title="Move Up">⬆️</button>
+                        <button class="btn-action btn-move" onclick="moveDown(this)" title="Move Down">⬇️</button>
+                        <button class="btn-action btn-delete" onclick="deleteRow(this)" title="Delete">X</button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer-controls">
+        <div class="buttons-group">
+            <button class="btn" onclick="addRow()">+ Add Row</button>
+            <button class="btn btn-pdf" onclick="generatePDF('full')">📄 Print Full (with prices)</button>
+            <button class="btn btn-pdf-simple" onclick="generatePDF('simple')">📄 Print Simple (no prices)</button>
+        </div>
+        
+        <div class="totals-container">
+            <div class="total-box">
+                Total Rolls: <span id="total-qty-val">0</span>
+            </div>
+            <div class="total-box grand-total">
+                Grand Total: <span id="grand-total-val">$0.00</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="print-area"></div>
+
+<script>
+    let globalGrandTotal = 0;
+    let globalTotalQty = 0;
+
+    const formatMoney = (amount) => {
+        return amount.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 });
+    };
+
+    function calculateAll() {
+        const sqmPrice = parseFloat(document.getElementById('sqm-price').value) || 0;
+        const rows = document.querySelectorAll('#table-body tr');
+        
+        globalGrandTotal = 0;
+        globalTotalQty = 0;
+
+        rows.forEach(row => {
+            const w = parseFloat(row.querySelector('.w-val').value) || 0;
+            const l = parseFloat(row.querySelector('.l-val').value) || 0;
+            const q = parseInt(row.querySelector('.q-val').value) || 0;
+
+            const area = (w / 100) * l;
+            const unitPrice = area * sqmPrice;
+            const lineTotal = unitPrice * q;
+
+            row.dataset.unitPrice = unitPrice;
+            row.dataset.lineTotal = lineTotal;
+
+            row.querySelector('.u-price').innerText = formatMoney(unitPrice);
+            row.querySelector('.l-total').innerText = formatMoney(lineTotal);
+
+            globalGrandTotal += lineTotal;
+            globalTotalQty += q;
+        });
+
+        document.getElementById('grand-total-val').innerText = formatMoney(globalGrandTotal);
+        document.getElementById('total-qty-val').innerText = globalTotalQty;
+    }
+
+    function addRow() {
+        const tbody = document.getElementById('table-body');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><input type="number" class="w-val short-input" value="50" step="1" oninput="calculateAll()"></td>
+            <td><input type="number" class="l-val short-input" value="20" step="1" oninput="calculateAll()"></td>
+            <td><input type="number" class="t-val short-input" value="2.5" step="0.1" oninput="calculateAll()"></td>
+            <td><input type="number" class="q-val short-input" value="1" step="1" oninput="calculateAll()"></td>
+            <td><input type="text" class="n-val" placeholder="" oninput="calculateAll()"></td>
+            <td style="text-align: right; font-weight: 600;" class="u-price">$0.00</td>
+            <td style="text-align: right; font-weight: 600;" class="l-total">$0.00</td>
+            <td>
+                <div class="actions-cell">
+                    <button class="btn-action btn-move" onclick="moveUp(this)" title="Move Up">⬆️</button>
+                    <button class="btn-action btn-move" onclick="moveDown(this)" title="Move Down">⬇️</button>
+                    <button class="btn-action btn-delete" onclick="deleteRow(this)" title="Delete">X</button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(tr);
+        calculateAll();
+    }
+
+    function deleteRow(btn) {
+        btn.closest('tr').remove();
+        calculateAll();
+    }
+
+    // دالة تحريك الصف للأعلى
+    function moveUp(btn) {
+        const row = btn.closest('tr');
+        if (row.previousElementSibling) {
+            row.parentNode.insertBefore(row, row.previousElementSibling);
+        }
+    }
+
+    // دالة تحريك الصف للأسفل
+    function moveDown(btn) {
+        const row = btn.closest('tr');
+        if (row.nextElementSibling) {
+            row.parentNode.insertBefore(row.nextElementSibling, row);
+        }
+    }
+
+    // دالة الطباعة (تستثني أزرار التحكم تلقائياً لأنها مخفية عبر الـ CSS المخصص للطباعة)
+    function generatePDF(mode) {
+        const rows = document.querySelectorAll('#table-body tr');
+        let printTotalQty = 0;
+        
+        let printHTML = `
+            <table class="pdf-table">
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">Roll Size</th>
+                        <th style="text-align: center;">Quantity</th>
+                        ${mode === 'full' ? `
+                            <th style="text-align: right;">Unit Price (USD)</th>
+                            <th style="text-align: right;">Line Total (USD)</th>
+                        ` : ''}
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        rows.forEach((row) => {
+            const w = row.querySelector('.w-val').value || '0';
+            const l = row.querySelector('.l-val').value || '0';
+            const t = row.querySelector('.t-val').value || '0';
+            const noteInput = row.querySelector('.n-val').value.trim();
+            const note = noteInput ? ` (${noteInput})` : '';
+            
+            const q = parseInt(row.querySelector('.q-val').value) || 0;
+            const uPrice = parseFloat(row.dataset.unitPrice) || 0;
+            const lTotal = parseFloat(row.dataset.lineTotal) || 0;
+
+            printTotalQty += q;
+            const rollSizeStr = `${w} cm &times; ${l} m &times; ${t} mm${note}`;
+
+            printHTML += `
+                <tr>
+                    <td style="text-align: left;">${rollSizeStr}</td>
+                    <td style="text-align: center;">${q}</td>
+                    ${mode === 'full' ? `
+                        <td style="text-align: right;">${formatMoney(uPrice)}</td>
+                        <td style="text-align: right;">${formatMoney(lTotal)}</td>
+                    ` : ''}
+                </tr>
+            `;
+        });
+
+        printHTML += `
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td style="text-align: left;">Total</td>
+                        <td style="text-align: center;">${printTotalQty}</td>
+                        ${mode === 'full' ? `
+                            <td style="text-align: center;">-</td>
+                            <td style="text-align: right;">${formatMoney(globalGrandTotal)}</td>
+                        ` : ''}
+                    </tr>
+                </tfoot>
+            </table>
+        `;
+
+        document.getElementById('print-area').innerHTML = printHTML;
+        window.print();
+    }
+
+    window.onload = calculateAll;
+</script>
+</body>
+</html>
