@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rolls Pricing System</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        /* إضافة خط Cairo للغة العربية و Inter للغة الإنجليزية */
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
 
         :root {
             --primary: #18dcd8;
@@ -42,11 +43,19 @@
             margin-bottom: 30px;
             border-bottom: 1px solid var(--border);
             padding-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
         .header h1 {
             margin: 0;
             font-size: 1.5rem;
+        }
+
+        .settings-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
         .settings-card {
@@ -90,7 +99,7 @@
             border-bottom: 1px solid var(--border);
         }
 
-        .ui-table input {
+        .ui-table input, .ui-table select {
             width: 100%;
             padding: 10px;
             border: 1px solid var(--border);
@@ -98,9 +107,10 @@
             box-sizing: border-box;
             font-family: inherit;
             outline: none;
+            background-color: #fff;
         }
 
-        .ui-table .short-input { width: 70px; }
+        .ui-table .short-input { width: 85px; }
 
         .btn {
             background: var(--primary);
@@ -116,7 +126,6 @@
 
         .btn:hover { background: var(--primary-dark); }
         
-        /* تنسيق أزرار التحكم بالصفوف */
         .actions-cell {
             display: flex;
             gap: 5px;
@@ -175,21 +184,41 @@
             font-size: 1.1rem;
             font-weight: 600;
             color: #4b5563;
+            min-width: 250px;
+            text-align: right;
         }
 
-        .total-box span {
+        .total-box span.main-val {
             color: var(--text);
             font-weight: 700;
             font-size: 1.3rem;
             margin-left: 10px;
         }
 
-        .grand-total span {
+        .grand-total span.main-val {
             color: var(--primary-dark);
             font-size: 1.5rem;
         }
 
-        /* الحاوية المخفية للطباعة */
+        /* تنسيق السعر بالعراقي - تم التحديث */
+        .iqd-text {
+            display: block;
+            font-family: 'Cairo', sans-serif; /* الخط العربي الجديد */
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #d1d5db;
+            
+            /* تدرج لوني تركوازي داكن */
+            background: linear-gradient(135deg, #0d9488 0%, #064e3b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            
+            /* لضمان الترتيب (رقم ثم د.ع) */
+            direction: ltr;
+        }
+
         #print-area {
             display: none;
         }
@@ -199,18 +228,8 @@
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
-
-            @page {
-                size: A4 portrait;
-                margin: 15mm;
-            }
-
-            body {
-                background-color: #fff;
-                margin: 0;
-                padding: 0;
-            }
-
+            @page { size: A4 portrait; margin: 15mm; }
+            body { background-color: #fff; margin: 0; padding: 0; }
             .container { display: none !important; }
             #print-area { display: block !important; width: 100%; }
 
@@ -220,27 +239,33 @@
                 font-family: 'Calibri', 'Inter', sans-serif;
                 font-size: 14pt;
             }
-
             .pdf-table th, .pdf-table td {
                 border: 1pt solid #9cc2e5 !important;
                 padding: 8px 12px;
                 color: #000 !important;
             }
-
             .pdf-table thead th {
                 background-color: #5b9bd5 !important;
                 color: #ffffff !important;
                 font-weight: bold;
             }
-
             .pdf-table tbody tr:nth-child(even) { background-color: #ddebf7 !important; }
             .pdf-table tbody tr:nth-child(odd) { background-color: #ffffff !important; }
-
             .pdf-table tfoot th, .pdf-table tfoot td {
                 background-color: #404040 !important;
                 color: #ffffff !important;
                 font-weight: bold;
                 border: 1pt solid #404040 !important;
+            }
+            
+            /* تنسيق صف الدينار العراقي في الطباعة */
+            .pdf-table tfoot .iqd-print-row td {
+                background-color: #f0fdfa !important; /* خلفية تركوازية فاتحة جداً */
+                color: #0f766e !important; /* نص تركوازي داكن سادة (لأن التدرج لا يطبع جيداً أحياناً) */
+                border: 1pt solid #0f766e !important;
+                font-family: 'Cairo', 'Inter', sans-serif;
+                font-size: 15pt;
+                font-weight: bold;
             }
         }
     </style>
@@ -250,9 +275,15 @@
 <div class="container">
     <div class="header">
         <h1>Rolls Pricing & Management</h1>
-        <div class="settings-card">
-            <label>Price per Sqm (USD):</label>
-            <input type="number" id="sqm-price" value="3.85" step="0.01" oninput="calculateAll()">
+        <div class="settings-container">
+            <div class="settings-card">
+                <label>2.5mm Price/Sqm:</label>
+                <input type="number" id="price-25" value="3.85" step="0.01" oninput="calculateAll()">
+            </div>
+            <div class="settings-card">
+                <label>1.5mm Price/Sqm:</label>
+                <input type="number" id="price-15" value="2.50" step="0.01" oninput="calculateAll()">
+            </div>
         </div>
     </div>
 
@@ -273,7 +304,12 @@
             <tr>
                 <td><input type="number" class="w-val short-input" value="40" step="1" oninput="calculateAll()"></td>
                 <td><input type="number" class="l-val short-input" value="20" step="1" oninput="calculateAll()"></td>
-                <td><input type="number" class="t-val short-input" value="2.5" step="0.1" oninput="calculateAll()"></td>
+                <td>
+                    <select class="t-val short-input" onchange="calculateAll()">
+                        <option value="2.5" selected>2.5</option>
+                        <option value="1.5">1.5</option>
+                    </select>
+                </td>
                 <td><input type="number" class="q-val short-input" value="2" step="1" oninput="calculateAll()"></td>
                 <td><input type="text" class="n-val" placeholder="e.g. Other type" oninput="calculateAll()"></td>
                 <td style="text-align: right; font-weight: 600;" class="u-price">$0.00</td>
@@ -298,10 +334,12 @@
         
         <div class="totals-container">
             <div class="total-box">
-                Total Rolls: <span id="total-qty-val">0</span>
+                Total Rolls: <span id="total-qty-val" class="main-val">0</span>
             </div>
             <div class="total-box grand-total">
-                Grand Total: <span id="grand-total-val">$0.00</span>
+                <div>Grand Total: <span id="grand-total-val" class="main-val">$0.00</span></div>
+                <!-- الخانة المحدثة للعراقي -->
+                <div id="grand-total-iqd" class="iqd-text">≈ 0 د.ع</div>
             </div>
         </div>
     </div>
@@ -312,13 +350,16 @@
 <script>
     let globalGrandTotal = 0;
     let globalTotalQty = 0;
+    const EXCHANGE_RATE = 1320; 
 
     const formatMoney = (amount) => {
         return amount.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 });
     };
 
     function calculateAll() {
-        const sqmPrice = parseFloat(document.getElementById('sqm-price').value) || 0;
+        const price25 = parseFloat(document.getElementById('price-25').value) || 0;
+        const price15 = parseFloat(document.getElementById('price-15').value) || 0;
+        
         const rows = document.querySelectorAll('#table-body tr');
         
         globalGrandTotal = 0;
@@ -327,7 +368,10 @@
         rows.forEach(row => {
             const w = parseFloat(row.querySelector('.w-val').value) || 0;
             const l = parseFloat(row.querySelector('.l-val').value) || 0;
+            const t = parseFloat(row.querySelector('.t-val').value) || 2.5;
             const q = parseInt(row.querySelector('.q-val').value) || 0;
+
+            const sqmPrice = (t === 1.5) ? price15 : price25;
 
             const area = (w / 100) * l;
             const unitPrice = area * sqmPrice;
@@ -345,6 +389,10 @@
 
         document.getElementById('grand-total-val').innerText = formatMoney(globalGrandTotal);
         document.getElementById('total-qty-val').innerText = globalTotalQty;
+
+        // تحديث إجمالي الدينار العراقي بالشكل (1,320 د.ع)
+        const totalIQD = globalGrandTotal * EXCHANGE_RATE;
+        document.getElementById('grand-total-iqd').innerHTML = `≈ <span style="font-family: 'Inter', sans-serif;">${totalIQD.toLocaleString('en-US')}</span> د.ع`;
     }
 
     function addRow() {
@@ -353,7 +401,12 @@
         tr.innerHTML = `
             <td><input type="number" class="w-val short-input" value="50" step="1" oninput="calculateAll()"></td>
             <td><input type="number" class="l-val short-input" value="20" step="1" oninput="calculateAll()"></td>
-            <td><input type="number" class="t-val short-input" value="2.5" step="0.1" oninput="calculateAll()"></td>
+            <td>
+                <select class="t-val short-input" onchange="calculateAll()">
+                    <option value="2.5" selected>2.5</option>
+                    <option value="1.5">1.5</option>
+                </select>
+            </td>
             <td><input type="number" class="q-val short-input" value="1" step="1" oninput="calculateAll()"></td>
             <td><input type="text" class="n-val" placeholder="" oninput="calculateAll()"></td>
             <td style="text-align: right; font-weight: 600;" class="u-price">$0.00</td>
@@ -375,7 +428,6 @@
         calculateAll();
     }
 
-    // دالة تحريك الصف للأعلى
     function moveUp(btn) {
         const row = btn.closest('tr');
         if (row.previousElementSibling) {
@@ -383,7 +435,6 @@
         }
     }
 
-    // دالة تحريك الصف للأسفل
     function moveDown(btn) {
         const row = btn.closest('tr');
         if (row.nextElementSibling) {
@@ -391,7 +442,6 @@
         }
     }
 
-    // دالة الطباعة (تستثني أزرار التحكم تلقائياً لأنها مخفية عبر الـ CSS المخصص للطباعة)
     function generatePDF(mode) {
         const rows = document.querySelectorAll('#table-body tr');
         let printTotalQty = 0;
@@ -437,6 +487,8 @@
             `;
         });
 
+        const totalIQD = globalGrandTotal * EXCHANGE_RATE;
+
         printHTML += `
                 </tbody>
                 <tfoot>
@@ -445,9 +497,19 @@
                         <td style="text-align: center;">${printTotalQty}</td>
                         ${mode === 'full' ? `
                             <td style="text-align: center;">-</td>
-                            <td style="text-align: right;">${formatMoney(globalGrandTotal)}</td>
+                            <td style="text-align: right;">
+                                ${formatMoney(globalGrandTotal)}
+                            </td>
                         ` : ''}
                     </tr>
+                    ${mode === 'full' ? `
+                    <tr class="iqd-print-row">
+                        <td colspan="3" style="text-align: right; padding-right: 15px;">الإجمالي بالدينار العراقي (≈)</td>
+                        <td style="text-align: right; direction: ltr;">
+                            <span style="font-family: 'Inter', sans-serif;">${totalIQD.toLocaleString('en-US')}</span> د.ع
+                        </td>
+                    </tr>
+                    ` : ''}
                 </tfoot>
             </table>
         `;
